@@ -171,40 +171,46 @@ export default class RefreshPostCard extends React.Component {
 		const { post, site, feed, onCommentClick } = this.props;
 		const featuredImage = post.canonical_image;
 		const isPhotoOnly = post.display_type & DisplayTypes.PHOTO_ONLY;
+		const isGallery = post.display_type & DisplayTypes.GALLERY;
 		const title = truncate( post.title, {
 			length: 140,
 			separator: /,? +/
 		} );
 
-		// only feature an embed if we know how to thumbnail & autoplay it
-		const featuredEmbed = head( filter( post.content_embeds, ( embed ) => embed.thumbnailUrl && embed.autoplayIframe ) );
+		if ( ! isGallery ) {
+			// only feature an embed if we know how to thumbnail & autoplay it
+			const featuredEmbed = head( filter( post.content_embeds, ( embed ) => embed.thumbnailUrl && embed.autoplayIframe ) );
 
-		// we only show a featured embed when all of these are true
-		//   - there is no featured image on the post that's big enough to pass as the canonical image
-		//   - there is an available embed
-		//
-		const useFeaturedEmbed = featuredEmbed &&
-			( ! featuredImage || ( featuredImage !== post.featured_image && featuredImage !== get( post, 'post_thumbnail.URL' ) ) );
+			// we only show a featured embed when all of these are true
+			//   - there is no featured image on the post that's big enough to pass as the canonical image
+			//   - there is an available embed
+			//
+			const useFeaturedEmbed = featuredEmbed &&
+				( ! featuredImage || ( featuredImage !== post.featured_image && featuredImage !== get( post, 'post_thumbnail.URL' ) ) );
 
-		const featuredAsset = useFeaturedEmbed
-			? <FeaturedVideo { ...featuredEmbed } videoEmbed={ featuredEmbed } />
-			: <FeaturedImage imageUri={ get( featuredImage, 'uri' ) } href={ post.URL } />;
+			const featuredAsset = useFeaturedEmbed
+				? <FeaturedVideo { ...featuredEmbed } videoEmbed={ featuredEmbed } />
+				: <FeaturedImage imageUri={ get( featuredImage, 'uri' ) } href={ post.URL } />;
+		}
 
 		const classes = classnames( 'reader-post-card', {
 			'has-thumbnail': !! featuredAsset,
 			'is-photo': isPhotoOnly
+			'is-gallery': isGallery
 		} );
+		const showExcerpt = ! isPhotoOnly && ! isGallery;
+		const showFeaturedAsset = ! isGallery && featuredAsset;
 
 		return (
 			<Card className={ classes } onClick={ this.handleCardClick }>
 				<PostByline post={ post } site={ site } feed={ feed } />
 				<div className="reader-post-card__post">
-					{ featuredAsset }
+					{ showFeaturedAsset && featuredAsset }
 					<div className="reader-post-card__post-details">
 						<h1 className="reader-post-card__title">
 							<a className="reader-post-card__title-link" href={ post.URL }>{ title }</a>
 						</h1>
-						{ ! isPhotoOnly && <div className="reader-post-card__excerpt">{ post.short_excerpt }</div> }
+						{ showExcerpt && <div className="reader-post-card__excerpt">{ post.short_excerpt }</div> }
 						{ post &&
 							<ReaderPostActions
 								post={ post }

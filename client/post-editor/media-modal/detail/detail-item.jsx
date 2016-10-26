@@ -108,10 +108,15 @@ class EditorMediaModalDetailItem extends Component {
 			return null;
 		}
 
+		const handleRestore = event => {
+			
+			onRestore( item, event );
+		};
+
 		return (
 			<Button
 				className="editor-media-modal-detail__restore"
-				onClick={ onRestore }
+				onClick={ handleRestore }
 			>
 				<Gridicon icon="refresh" size={ 36 } /> { translate( 'Restore Original' ) }
 			</Button>
@@ -198,7 +203,7 @@ class EditorMediaModalDetailItem extends Component {
 
 		return React.createElement( Item, {
 			site: site,
-			item: item
+			item: item,
 		} );
 	}
 

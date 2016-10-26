@@ -138,6 +138,20 @@ export const EditorMediaModal = React.createClass( {
 		this.props.onClose( selectedItems );
 	},
 
+	restoreOriginalMedia: function( item ) {
+		const media = item.revision_history && item.revision_history.original
+			? item.revision_history.original.URL
+			: null;
+
+		const siteId = this.props.site ? this.props.site.ID : null;
+
+		if ( ! siteId ) {
+			return null;
+		}
+
+		MediaActions.updateTemporally( 'RECEIVE_MEDIA_ITEM', siteId, { ID: item.ID, media } );
+	},
+
 	setDetailSelectedIndex: function( index ) {
 		this.setState( {
 			detailSelectedIndex: index
@@ -383,6 +397,7 @@ export const EditorMediaModal = React.createClass( {
 						site={ this.props.site }
 						items={ this.props.mediaLibrarySelectedItems }
 						selectedIndex={ this.getDetailSelectedIndex() }
+						onRestoreItem={ this.restoreOriginalMedia }
 						onSelectedIndexChange={ this.setDetailSelectedIndex } />
 				);
 				break;

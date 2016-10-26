@@ -106,6 +106,10 @@ MediaActions.createTransientMedia = function( id, file, date ) {
 			extension: MediaUtils.getFileExtension( file ),
 			mime_type: MediaUtils.getMimeType( file )
 		} );
+
+		if ( /^https?\:\/\//.test( file ) ) {
+			assign( transientMedia, { URL: file } );
+		}
 	} else {
 		// Handle the case where a an object has been passed that wraps a
 		// Blob and contains a fileName
@@ -214,6 +218,29 @@ MediaActions.add = function( siteId, files ) {
 	}, Promise.resolve() );
 };
 
+MediaActions.updateTemporally = function( type, siteId, item ) {
+	const mediaId = item.ID;
+	const newItem = assign( {}, MediaStore.get( siteId, mediaId ), item );
+
+	// Let's update the media modal immediately
+	// with a fake transient media item
+	const updateAction = {
+		type,
+		siteId,
+		data: newItem
+	};
+
+	if ( item.media ) {
+		// Show a fake transient media item that can be rendered into the list immediately,
+		// even before the media has persisted to the server`
+		updateAction.data = { ...newItem, ...MediaActions.createTransientMedia( mediaId, item.media ) };
+	}
+
+	debug( 'Updating temporally the media for %o by ID %o to %o', siteId, mediaId, updateAction );
+
+	Dispatcher.handleViewAction( updateAction );
+};
+
 MediaActions.edit = function( siteId, item ) {
 	var newItem = assign( {}, MediaStore.get( siteId, item.ID ), item );
 
@@ -230,25 +257,7 @@ MediaActions.update = function( siteId, item, editMediaFile = false ) {
 		return;
 	}
 
-	const mediaId = item.ID;
-	const newItem = assign( {}, MediaStore.get( siteId, mediaId ), item );
-
-	// Let's update the media modal immediately
-	// with a fake transient media item
-	const updateAction = {
-		type: 'RECEIVE_MEDIA_ITEM',
-		siteId,
-		data: newItem
-	};
-
-	if ( item.media ) {
-		// Show a fake transient media item that can be rendered into the list immediately,
-		// even before the media has persisted to the server`
-		updateAction.data = { ...newItem, ...MediaActions.createTransientMedia( mediaId, item.media ) };
-	}
-
-	debug( 'Updating media for %o by ID %o to %o', siteId, mediaId, updateAction );
-	Dispatcher.handleViewAction( updateAction );
+	MediaActions.updateTemporally( 'RECEIVE_MEDIA_ITEM', siteId, item );
 
 	const method = editMediaFile ? 'edit' : 'update';
 

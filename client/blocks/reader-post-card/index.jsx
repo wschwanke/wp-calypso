@@ -177,6 +177,7 @@ export default class RefreshPostCard extends React.Component {
 			length: 140,
 			separator: /,? +/
 		} );
+		let featuredAsset;
 
 		if ( ! isGallery ) {
 			// only feature an embed if we know how to thumbnail & autoplay it
@@ -189,14 +190,14 @@ export default class RefreshPostCard extends React.Component {
 			const useFeaturedEmbed = featuredEmbed &&
 				( ! featuredImage || ( featuredImage !== post.featured_image && featuredImage !== get( post, 'post_thumbnail.URL' ) ) );
 
-			const featuredAsset = useFeaturedEmbed
+			featuredAsset = useFeaturedEmbed
 				? <FeaturedVideo { ...featuredEmbed } videoEmbed={ featuredEmbed } />
 				: <FeaturedImage imageUri={ get( featuredImage, 'uri' ) } href={ post.URL } />;
 		}
 
 		const classes = classnames( 'reader-post-card', {
 			'has-thumbnail': !! featuredAsset,
-			'is-photo': isPhotoOnly
+			'is-photo': isPhotoOnly,
 			'is-gallery': isGallery
 		} );
 		const showExcerpt = ! isPhotoOnly && ! isGallery;

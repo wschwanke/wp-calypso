@@ -109,16 +109,21 @@ class EditorMediaModalDetailItem extends Component {
 		}
 
 		const handleRestore = event => {
-			
 			onRestore( item, event );
 		};
 
+		const isRestoring = item.restoring_original;
+
+		const buttonText = isRestoring
+			? translate( 'Apply' )
+			: translate( 'Restore Original' );
+
 		return (
 			<Button
-				className="editor-media-modal-detail__restore"
+				className={ classNames( 'editor-media-modal-detail__restore', { 'is-restoring': isRestoring } ) }
 				onClick={ handleRestore }
 			>
-				<Gridicon icon="refresh" size={ 36 } /> { translate( 'Restore Original' ) }
+				<Gridicon icon="refresh" size={ 36 } /> { buttonText }
 			</Button>
 		);
 	}

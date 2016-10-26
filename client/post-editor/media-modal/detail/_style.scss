@@ -139,8 +139,26 @@
 	}
 }
 
-.editor-media-modal-detail__restore .gridicon {
-	transform: scaleX( -1 );
+.editor-media-modal-detail__restore {
+	.gridicon {
+		transform: scaleX( -1 );
+	}
+
+	&.is-restoring .gridicon {
+		animation-duration: 0.5s;
+  		animation-name: ninetyDegRotation;
+  		animation-fill-mode: forwards;
+	}
+}
+
+@keyframes ninetyDegRotation {
+  from {
+    transform: scaleX( -1 ) rotate( 0 );
+  }
+
+  to {
+    transform: scaleX( -1 ) rotate( 90deg );
+  }
 }
 
 .editor-media-modal-detail__sidebar {

@@ -149,6 +149,9 @@ export const EditorMediaModal = React.createClass( {
 			return null;
 		}
 
+		// set restoring original to true
+		item.restoring_original = true;
+
 		MediaActions.updateTemporally( 'RECEIVE_MEDIA_ITEM', siteId, { ID: item.ID, media } );
 	},
 

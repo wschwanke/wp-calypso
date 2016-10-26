@@ -43,7 +43,7 @@ class EditorMediaModalDetailItem extends Component {
 		onEdit: noop
 	};
 
-	renderEditButton( className ) {
+	renderEditButton() {
 		const {
 			item,
 			onEdit,
@@ -54,7 +54,6 @@ class EditorMediaModalDetailItem extends Component {
 		// Do not render edit button for private sites
 		if ( site.is_private ) {
 			debug( 'Do not show `Edit button` for private sites' );
-
 			return null;
 		}
 
@@ -75,10 +74,7 @@ class EditorMediaModalDetailItem extends Component {
 
 		return (
 			<Button
-				className={ classNames(
-					'editor-media-modal-detail__button-action',
-					'editor-media-modal-detail__edit',
-				className ) }
+				className="editor-media-modal-detail__edit"
 				onClick={ onEdit }
 				disabled={ isItemBeingUploaded( item ) }
 			>
@@ -87,7 +83,7 @@ class EditorMediaModalDetailItem extends Component {
 		);
 	}
 
-	renderRestoreButton( className ) {
+	renderRestoreButton() {
 		const {
 			item,
 			onRestore,
@@ -112,11 +108,7 @@ class EditorMediaModalDetailItem extends Component {
 
 		return (
 			<Button
-				className={ classNames(
-					'editor-media-modal-detail__button-action',
-					'editor-media-modal-detail__restore',
-					className
-				) }
+				className="editor-media-modal-detail__restore"
 				onClick={ onRestore }
 			>
 				<Gridicon icon="refresh" size={ 36 } /> { translate( 'Restore Original' ) }
@@ -185,10 +177,7 @@ class EditorMediaModalDetailItem extends Component {
 	}
 
 	renderItem() {
-		const {
-			item,
-			site
-		} = this.props;
+		const { item, site } = this.props;
 
 		if ( ! item ) {
 			return null;
@@ -211,6 +200,21 @@ class EditorMediaModalDetailItem extends Component {
 		} );
 	}
 
+	renderEditionBar( item, classname = 'is-desktop' ) {
+		const hasOriginal = item.revision_history &&
+			item.revision_history.original &&
+			item.revision_history.original.URL;
+
+		const classes = classNames( 'editor-media-modal-detail__edition-bar', classname );
+
+		return (
+			<div className={ classes }>
+				{ hasOriginal && this.renderRestoreButton( classname ) }
+				{ this.renderEditButton( classname ) }
+			</div>
+		);
+	}
+
 	render() {
 		const { item } = this.props;
 
@@ -218,28 +222,24 @@ class EditorMediaModalDetailItem extends Component {
 			'is-loading': ! item
 		} );
 
-		const hasOriginal = item.revision_history &&
-			item.revision_history.original &&
-			item.revision_history.original.URL;
-
 		return (
 			<figure className={ classes }>
 				<div className="editor-media-modal-detail__content editor-media-modal__content">
+
 					<div className="editor-media-modal-detail__preview-wrapper">
 						{ this.renderItem() }
-						{ this.renderEditButton( 'is-desktop' ) }
-						{ hasOriginal && this.renderRestoreButton( 'is-desktop' ) }
+						{ this.renderEditionBar( item ) }
 						{ this.renderPreviousItemButton() }
 						{ this.renderNextItemButton() }
 					</div>
 
 					<div className="editor-media-modal-detail__sidebar">
-						{ this.renderEditButton( 'is-mobile' ) }
-						{ hasOriginal && this.renderRestoreButton( 'is-mobile' ) }
+						{ this.renderEditionBar( item, 'is-mobile' ) }
 						{ this.renderFields() }
 						<EditorMediaModalDetailFileInfo
 							item={ item } />
 					</div>
+
 				</div>
 			</figure>
 		);

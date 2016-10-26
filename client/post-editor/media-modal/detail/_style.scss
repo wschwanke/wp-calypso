@@ -100,23 +100,42 @@
 	}
 }
 
-.editor-media-modal-detail__button-action {
-	font-weight: bold;
+.editor-media-modal-detail__edition-bar {
 	display: none;
+
 	&.is-desktop {
 		@include breakpoint( ">480px" ) {
 			display: block;
-			float: right;
-    		margin: 8px 8px 0 0;
+			position: absolute;
+		    top: 8px;
+		    right: 8px;
+
+		    button {
+		    	margin-left: 8px;
+		    }
 		}
 	}
 
 	&.is-mobile {
 		@include breakpoint( "<480px" ) {
 			display: block;
-			width: 100%;
- 			margin-bottom: 8px;
+			button {
+				width: 48%;
+	 			margin-bottom: 8px;
+
+	 			&:first-child {
+	 				margin-right: 2%;
+	 			}
+
+	 			&:last-child {
+	 				margin-left: 2%;
+	 			}
+	 		}
 		}
+	}
+
+	button {
+		font-weight: bold;
 	}
 }
 

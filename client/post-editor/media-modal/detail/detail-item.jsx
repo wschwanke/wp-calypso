@@ -32,7 +32,8 @@ class EditorMediaModalDetailItem extends Component {
 		hasNextItem: PropTypes.bool,
 		onShowPreviousItem: PropTypes.func,
 		onShowNextItem: PropTypes.func,
-		onEdit: PropTypes.func
+		onEdit: PropTypes.func,
+		onRestore: PropTypes.func,
 	};
 
 	static defaultProps = {
@@ -40,7 +41,8 @@ class EditorMediaModalDetailItem extends Component {
 		hasNextItem: false,
 		onShowPreviousItem: noop,
 		onShowNextItem: noop,
-		onEdit: noop
+		onEdit: noop,
+		onRestore: noop,
 	};
 
 	renderEditButton() {

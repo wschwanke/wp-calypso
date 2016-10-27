@@ -218,6 +218,20 @@ MediaActions.add = function( siteId, files ) {
 	}, Promise.resolve() );
 };
 
+MediaActions.cleanTemporaryData = function( siteId, item, fields ) {
+	for ( let i = 0; i < fields.length; i++ ) {
+		delete item[ fields[ i ] ];
+	}
+
+	const updateAction = {
+		type: 'RECEIVE_MEDIA_ITEM',
+		siteId,
+		data: item
+	};
+
+	Dispatcher.handleViewAction( updateAction );
+};
+
 MediaActions.updateTemporally = function( type, siteId, item ) {
 	const mediaId = item.ID;
 	const newItem = assign( {}, MediaStore.get( siteId, mediaId ), item );

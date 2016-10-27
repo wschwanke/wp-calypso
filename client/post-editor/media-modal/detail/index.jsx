@@ -4,6 +4,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { noop, partial } from 'lodash';
+import classNames from 'classnames';
 
 /**
  * Internal dependencies
@@ -64,11 +65,21 @@ const EditorMediaModalDetail = React.createClass( {
 
 			onEditItem,
 			onRestoreItem,
+			onImageItemLoad,
+			onApplyRestoreItem,
+			onDiscardRestoreItem,
 			onReturnToList,
 		} = this.props;
 
+		const item = items[ selectedIndex ];
+
 		return (
-			<div className="editor-media-modal-detail">
+			<div className={ classNames(
+				'editor-media-modal-detail',
+				{ 'is-loading-original': item.loading_original },
+				{ 'is-original-loaded': item.original_loaded },
+			) }
+			>
 				<HeaderCake onClick={ onReturnToList } backText={ this.translate( 'Media Library' ) }>
 					<EditorMediaModalDetailTitle
 						site={ site }
@@ -76,13 +87,16 @@ const EditorMediaModalDetail = React.createClass( {
 				</HeaderCake>
 				<DetailItem
 					site={ site }
-					item={ items[ selectedIndex ] }
+					item={ item }
 					hasPreviousItem={ selectedIndex - 1 >= 0 }
 					hasNextItem={ selectedIndex + 1 < items.length }
 					onShowPreviousItem={ this.incrementIndex.bind( this, -1 ) }
 					onShowNextItem={ this.incrementIndex.bind( this, 1 ) }
 					onEdit={ onEditItem }
-					onRestore={ onRestoreItem } />
+					onRestore={ onRestoreItem }
+					onRestoreApply={ onApplyRestoreItem }
+					onRestoreDiscard={ onDiscardRestoreItem }
+					onImageLoad={ onImageItemLoad } />
 			</div>
 		);
 	}

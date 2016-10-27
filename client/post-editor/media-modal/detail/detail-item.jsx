@@ -33,7 +33,9 @@ class EditorMediaModalDetailItem extends Component {
 		onShowPreviousItem: PropTypes.func,
 		onShowNextItem: PropTypes.func,
 		onEdit: PropTypes.func,
+		onImageLoad: PropTypes.func,
 		onRestore: PropTypes.func,
+		onRestoreApply: PropTypes.func,
 	};
 
 	static defaultProps = {
@@ -42,7 +44,9 @@ class EditorMediaModalDetailItem extends Component {
 		onShowPreviousItem: noop,
 		onShowNextItem: noop,
 		onEdit: noop,
+		onImageLoad: noop,
 		onRestore: noop,
+		onRestoreApply: noop,
 	};
 
 	renderEditButton() {
@@ -78,7 +82,7 @@ class EditorMediaModalDetailItem extends Component {
 			<Button
 				className="editor-media-modal-detail__edit"
 				onClick={ onEdit }
-				disabled={ isItemBeingUploaded( item ) }
+				disabled={ isItemBeingUploaded( item ) || item.original_loaded }
 			>
 				<Gridicon icon="pencil" size={ 36 } /> { translate( 'Edit Image' ) }
 			</Button>
@@ -89,9 +93,64 @@ class EditorMediaModalDetailItem extends Component {
 		const {
 			item,
 			onRestore,
-			site,
+			onRestoreApply,
 			translate
 		} = this.props;
+
+		const isLoading = item.loading_original;
+		const isReadyToRestore = item.original_loaded;
+
+		const handleRestoringMethod = event => {
+			if ( isReadyToRestore ) {
+				return onRestoreApply( item, event );
+			}
+
+			return onRestore( item, event );
+		};
+
+		const buttonText = isReadyToRestore ? translate( 'Apply' ) : translate( 'Restore Original' );
+
+		return (
+			<Button
+				className={ classNames(
+					'editor-media-modal-detail__restore',
+					{ 'is-loading': isLoading },
+					{ 'is-ready': isReadyToRestore },
+				) }
+				disabled={ isLoading }
+				onClick={ handleRestoringMethod }
+			>
+				<Gridicon
+					icon={ isReadyToRestore ? 'checkmark' : 'refresh' }
+					size={ 36 } />
+					&nbsp;{ buttonText }
+			</Button>
+		);
+	}
+
+	renderDiscardRestoreButton() {
+		const {
+			item,
+			onRestoreDiscard,
+			translate
+		} = this.props;
+
+		const handleCancelRestoringMethod = event => {
+			onRestoreDiscard( item, event );
+		};
+
+		return (
+			<Button
+				className="editor-media-modal-detail__cancel_restore"
+				onClick={ handleCancelRestoringMethod }
+			>
+				<Gridicon icon="trash" size={ 36 } /> { translate( 'Discard' ) }
+			</Button>
+		);
+	}
+
+	renderEditionBar( item, classname = 'is-desktop' ) {
+		const { site } = this.props;
 
 		// Do not render edit button for private sites
 		if ( site.is_private ) {
@@ -108,23 +167,20 @@ class EditorMediaModalDetailItem extends Component {
 			return null;
 		}
 
-		const handleRestore = event => {
-			onRestore( item, event );
-		};
+		const hasOriginal = item.revision_history &&
+			item.revision_history.original &&
+			item.revision_history.original.URL;
 
-		const isRestoring = item.restoring_original;
+		const originalWasLoaded = ! item.loading_original && item.original_loaded;
 
-		const buttonText = isRestoring
-			? translate( 'Apply' )
-			: translate( 'Restore Original' );
+		const classes = classNames( 'editor-media-modal-detail__edition-bar', classname );
 
 		return (
-			<Button
-				className={ classNames( 'editor-media-modal-detail__restore', { 'is-restoring': isRestoring } ) }
-				onClick={ handleRestore }
-			>
-				<Gridicon icon="refresh" size={ 36 } /> { buttonText }
-			</Button>
+			<div className={ classes }>
+				{ originalWasLoaded && this.renderDiscardRestoreButton( classname ) }
+				{ hasOriginal && this.renderRestoreButton( classname ) }
+				{ this.renderEditButton( classname ) }
+			</div>
 		);
 	}
 
@@ -206,25 +262,15 @@ class EditorMediaModalDetailItem extends Component {
 			default: Item = EditorMediaModalDetailPreviewDocument; break;
 		}
 
+		const handleOnLoad = ( event ) => {
+			this.props.onImageLoad( item, event );
+		};
+
 		return React.createElement( Item, {
 			site: site,
 			item: item,
+			onLoad: handleOnLoad
 		} );
-	}
-
-	renderEditionBar( item, classname = 'is-desktop' ) {
-		const hasOriginal = item.revision_history &&
-			item.revision_history.original &&
-			item.revision_history.original.URL;
-
-		const classes = classNames( 'editor-media-modal-detail__edition-bar', classname );
-
-		return (
-			<div className={ classes }>
-				{ hasOriginal && this.renderRestoreButton( classname ) }
-				{ this.renderEditButton( classname ) }
-			</div>
-		);
 	}
 
 	render() {

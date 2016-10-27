@@ -47,7 +47,7 @@ export class LostPassword extends Component {
 					{ translate( 'Lost your password' ) }
 				</h2>
 
-				<p>{ translate( 'Follow theses simple steps to reset your account:' ) }</p>
+				<p>{ translate( 'Follow these simple steps to reset your account:' ) }</p>
 
 				<ol className="lost-password__instruction-list">
 					<li>
@@ -69,7 +69,7 @@ export class LostPassword extends Component {
 
 				<p>
 					{ translate(
-						'Want more help? We have a full {{link}}guid to resetting your password{{/link}}.',
+						'Want more help? We have a full {{link}}guide to resetting your password{{/link}}.',
 						{ components: { link: <a href={ support.ACCOUNT_RECOVERY } /> } }
 					) }
 				</p>
